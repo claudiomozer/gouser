@@ -52,3 +52,28 @@ func (h *UserHandler) Create(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 	}
 }
+
+func (h *UserHandler) Delete(ctx *gin.Context) {
+	userID := ctx.Param("id")
+
+	deleteErr := h.service.Delete(ctx, userID)
+	if deleteErr != nil {
+		logger.FromContext(ctx).Error("delete-user-error", "err", deleteErr)
+		var domainErr *err.Error
+		if errors.As(deleteErr, &domainErr) {
+			var statusCode int
+			switch domainErr.Code() {
+			case err.ErrUserNotExists:
+				statusCode = http.StatusNotFound
+			default:
+				statusCode = http.StatusBadRequest
+			}
+			ctx.AbortWithStatusJSON(statusCode, gin.H{
+				"code":    domainErr.Code(),
+				"message": domainErr.Message(),
+			})
+			return
+		}
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+}

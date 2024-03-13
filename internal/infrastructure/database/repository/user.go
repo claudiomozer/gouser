@@ -46,3 +46,21 @@ func (r *UserRepository) Create(ctx context.Context, entity *user.Entity) error 
 	}
 	return nil
 }
+
+func (r *UserRepository) Delete(ctx context.Context, userID string) error {
+	query := "DELETE FROM users WHERE id = @id"
+
+	command, execErr := r.pool.Exec(ctx, query, pgx.NamedArgs{
+		"id": userID,
+	})
+
+	if execErr != nil {
+		return execErr
+	}
+
+	if command.RowsAffected() == 0 {
+		return err.New(err.ErrUserNotExists, "user not exists")
+	}
+
+	return nil
+}

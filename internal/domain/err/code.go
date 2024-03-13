@@ -6,4 +6,5 @@ const (
 	ErrMissingRequiredField Code = 1
 	ErrInvalidField         Code = 2
 	ErrUserAlreadyExists    Code = 3
+	ErrUserNotExists        Code = 4
 )
