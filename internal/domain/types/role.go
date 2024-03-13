@@ -1,5 +1,9 @@
 package types
 
+import (
+	"encoding/json"
+)
+
 type Role byte
 
 const (
@@ -24,4 +28,22 @@ func FromStringRole(stringRole StringRole) Role {
 
 func (r Role) Update(new Role) Role {
 	return r | new
+}
+
+func (r Role) MarshalJSON() ([]byte, error) {
+	roles := []string{}
+
+	if r&Admin == Admin {
+		roles = append(roles, "ADMIN")
+	}
+
+	if r&Modifier == Modifier {
+		roles = append(roles, "MODIFIER")
+	}
+
+	if r&Watcher == Watcher {
+		roles = append(roles, "WATCHER")
+	}
+
+	return json.Marshal(roles)
 }

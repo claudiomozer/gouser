@@ -70,3 +70,43 @@ func (r *UpdateRoleRequest) Validate() error {
 
 	return nil
 }
+
+type GetUsersRequest struct {
+	UserID *string           `json:"id"`
+	Name   *types.Name       `json:"name"`
+	Role   *types.StringRole `json:"role"`
+	Email  *types.Email      `json:"email"`
+}
+
+func (r *GetUsersRequest) Validate() error {
+	switch {
+	case r.UserID != nil && strings.TrimSpace(*r.UserID) == "":
+		return err.MissingRequiredField("id")
+	case r.Name != nil && strings.TrimSpace(r.Name.String()) == "":
+		return err.InvalidField("name")
+	case r.Email != nil && strings.TrimSpace(r.Email.String()) == "":
+		return err.InvalidField("email")
+	case r.Role != nil && strings.TrimSpace(r.Role.String()) == "":
+		return err.InvalidField("role")
+	}
+
+	if r.Name != nil {
+		if validateErr := r.Name.Validate(); validateErr != nil {
+			return validateErr
+		}
+	}
+
+	if r.Email != nil {
+		if validateErr := r.Email.Validate(); validateErr != nil {
+			return validateErr
+		}
+	}
+
+	if r.Role != nil {
+		if validateErr := r.Role.Validate(); validateErr != nil {
+			return validateErr
+		}
+	}
+
+	return nil
+}

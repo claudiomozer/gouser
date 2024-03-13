@@ -50,7 +50,36 @@ func (h *UserHandler) Create(ctx *gin.Context) {
 			return
 		}
 		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"message": "user created",
+	})
+}
+
+func (h *UserHandler) Get(ctx *gin.Context) {
+	var request *user.GetUsersRequest
+	bindErr := ctx.ShouldBindJSON(&request)
+	if bindErr != nil {
+		request = &user.GetUsersRequest{}
+	}
+
+	users, getErr := h.service.Get(ctx, request)
+	if getErr != nil {
+		logger.FromContext(ctx).Error("get-user-error", "err", getErr)
+		var domainErr *err.Error
+		if errors.As(getErr, &domainErr) {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"code":    domainErr.Code(),
+				"message": domainErr.Message(),
+			})
+			return
+		}
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.AbortWithStatusJSON(http.StatusOK, users)
 }
 
 func (h *UserHandler) UpdateRole(ctx *gin.Context) {
@@ -85,7 +114,11 @@ func (h *UserHandler) UpdateRole(ctx *gin.Context) {
 			return
 		}
 		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"message": "user updated",
+	})
 }
 
 func (h *UserHandler) Delete(ctx *gin.Context) {
@@ -110,5 +143,9 @@ func (h *UserHandler) Delete(ctx *gin.Context) {
 			return
 		}
 		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"message": "user deleted",
+	})
 }

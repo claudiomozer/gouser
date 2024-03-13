@@ -10,6 +10,7 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, user *Entity) error
 	GetUserRole(ctx context.Context, userID string) (types.Role, error)
+	GetUser(ctx context.Context, request *GetUsersRequest) ([]Entity, error)
 	UpdateRole(ctx context.Context, userID string, role types.Role) error
 	Delete(ctx context.Context, userID string) error
 }

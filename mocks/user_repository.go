@@ -69,6 +69,21 @@ func (mr *MockUserRepositoryMockRecorder) Delete(ctx, userID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUserRepository)(nil).Delete), ctx, userID)
 }
 
+// GetUser mocks base method.
+func (m *MockUserRepository) GetUser(ctx context.Context, request *user.GetUsersRequest) ([]user.Entity, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUser", ctx, request)
+	ret0, _ := ret[0].([]user.Entity)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser.
+func (mr *MockUserRepositoryMockRecorder) GetUser(ctx, request any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockUserRepository)(nil).GetUser), ctx, request)
+}
+
 // GetUserRole mocks base method.
 func (m *MockUserRepository) GetUserRole(ctx context.Context, userID string) (types.Role, error) {
 	m.ctrl.T.Helper()

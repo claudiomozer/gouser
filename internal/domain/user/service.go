@@ -29,6 +29,14 @@ func (s *Service) Create(ctx context.Context, request *CreateRequest) error {
 	return s.repository.Create(ctx, user)
 }
 
+func (s *Service) Get(ctx context.Context, request *GetUsersRequest) ([]Entity, error) {
+	if validateErr := request.Validate(); validateErr != nil {
+		return nil, validateErr
+	}
+
+	return s.repository.GetUser(ctx, request)
+}
+
 func (s *Service) UpdateRole(ctx context.Context, request *UpdateRoleRequest) error {
 	if validateErr := request.Validate(); validateErr != nil {
 		return validateErr
