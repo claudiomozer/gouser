@@ -5,6 +5,7 @@ import (
 
 	"github.com/claudiomozer/gouser/internal/domain/err"
 	"github.com/claudiomozer/gouser/internal/domain/types"
+	"github.com/google/uuid"
 )
 
 type CreateRequest struct {
@@ -44,4 +45,28 @@ func (r *CreateRequest) ToEntity() *Entity {
 		Email: r.Email,
 		Role:  types.FromStringRole(r.Role),
 	}
+}
+
+type UpdateRoleRequest struct {
+	UserID string           `json:"id"`
+	Role   types.StringRole `json:"role"`
+}
+
+func (r *UpdateRoleRequest) Validate() error {
+	switch {
+	case strings.TrimSpace(r.UserID) == "":
+		return err.MissingRequiredField("id")
+	case strings.TrimSpace(r.Role.String()) == "":
+		return err.MissingRequiredField("role")
+	}
+
+	if _, validateErr := uuid.Parse(r.UserID); validateErr != nil {
+		return err.InvalidField("id")
+	}
+
+	if validateErr := r.Role.Validate(); validateErr != nil {
+		return validateErr
+	}
+
+	return nil
 }

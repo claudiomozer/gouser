@@ -53,6 +53,41 @@ func (h *UserHandler) Create(ctx *gin.Context) {
 	}
 }
 
+func (h *UserHandler) UpdateRole(ctx *gin.Context) {
+	var request *user.UpdateRoleRequest
+	bindErr := ctx.ShouldBindJSON(&request)
+	if bindErr != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"msg": "invalid body",
+		})
+		logger.FromContext(ctx).Error("update-user-role-error", "err", bindErr)
+		return
+	}
+
+	updateErr := h.service.UpdateRole(ctx, request)
+	if updateErr != nil {
+		logger.FromContext(ctx).Error("update-user-role-error", "err", updateErr)
+		var domainErr *err.Error
+		if errors.As(updateErr, &domainErr) {
+			var statusCode int
+			switch domainErr.Code() {
+			case err.ErrUserNotExists:
+				statusCode = http.StatusNotFound
+			case err.ErrOperationNotAllowed:
+				statusCode = http.StatusForbidden
+			default:
+				statusCode = http.StatusBadRequest
+			}
+			ctx.AbortWithStatusJSON(statusCode, gin.H{
+				"code":    domainErr.Code(),
+				"message": domainErr.Message(),
+			})
+			return
+		}
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+}
+
 func (h *UserHandler) Delete(ctx *gin.Context) {
 	userID := ctx.Param("id")
 

@@ -3,9 +3,12 @@ package types
 type Role byte
 
 const (
-	Admin    Role = 0b00000100
-	Modifier Role = 0b00000010
-	Watcher  Role = 0b00000001
+	Admin               Role = 0b00000100
+	Modifier            Role = 0b00000010
+	Watcher             Role = 0b00000001
+	AdminModifier       Role = Admin | Modifier
+	AdminModifierWacher Role = Admin | Modifier | Watcher
+	ModifierWatcher     Role = Modifier | Watcher
 )
 
 func FromStringRole(stringRole StringRole) Role {
@@ -17,4 +20,8 @@ func FromStringRole(stringRole StringRole) Role {
 	default: // watcher it's the lower role that any user could be
 		return Watcher
 	}
+}
+
+func (r Role) Update(new Role) Role {
+	return r | new
 }

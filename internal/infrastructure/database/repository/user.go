@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/claudiomozer/gouser/internal/domain/err"
+	"github.com/claudiomozer/gouser/internal/domain/types"
 	"github.com/claudiomozer/gouser/internal/domain/user"
 	"github.com/claudiomozer/gouser/internal/infrastructure/database"
 	"github.com/jackc/pgx/v5"
@@ -44,6 +45,42 @@ func (r *UserRepository) Create(ctx context.Context, entity *user.Entity) error 
 		}
 		return execErr
 	}
+	return nil
+}
+
+func (r *UserRepository) GetUserRole(ctx context.Context, userID string) (types.Role, error) {
+	query := "SELECT role FROM users WHERE id = $1"
+
+	var role types.Role
+	queryErr := r.pool.QueryRow(ctx, query, userID).Scan(&role)
+
+	if queryErr == pgx.ErrNoRows {
+		return types.Watcher, err.New(err.ErrUserNotExists, "user not exists")
+	}
+
+	if queryErr != nil {
+		return types.Watcher, queryErr
+	}
+
+	return role, nil
+}
+
+func (r *UserRepository) UpdateRole(ctx context.Context, userID string, role types.Role) error {
+	query := "UPDATE users SET role = @role WHERE id = @id"
+
+	command, execErr := r.pool.Exec(ctx, query, pgx.NamedArgs{
+		"role": role,
+		"id":   userID,
+	})
+
+	if execErr != nil {
+		return execErr
+	}
+
+	if command.RowsAffected() == 0 {
+		return err.New(err.ErrUserNotExists, "user not exists")
+	}
+
 	return nil
 }
 

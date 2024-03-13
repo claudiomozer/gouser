@@ -13,6 +13,7 @@ func BuildRoutes(engine *gin.Engine, container *app.Container) {
 	{
 		userHandler := NewUserHandler(container.UserService)
 		user.POST("", userHandler.Create)
+		user.PATCH("/role", userHandler.UpdateRole)
 		user.DELETE("/:id", userHandler.Delete)
 	}
 }
