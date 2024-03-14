@@ -9,14 +9,10 @@ mocks:
 	rm -rf ./mocks
 	go generate ./...
 
-.PHONY: load_environment
-load_environment:
-	export $(< .env)
-
 .PHONY: migrations
-migrations:	load_environment
+migrations:
 	tern migrate --migrations=./migrations
 
 .PHONY: run
-run: load_environment
+run: 
 	go run ./cmd/main.go
